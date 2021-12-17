@@ -17,6 +17,39 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
     const doLogin = async () => {
         try {
             if (!login || !password) {
+                setError('Favor preencher os dados');
+                return;
+            }
+
+            setError(' ');
+
+            const body = {
+                login,
+                password
+            };
+
+            const result = await executeRequest('login', 'POST', body);
+            if(result && result.data){
+                const loginResponse = result.data as LoginResponse;
+                localStorage.setItem('accessToken', loginResponse.token);
+                localStorage.setItem('userName', loginResponse.name);
+                localStorage.setItem('userEmail', loginResponse.email);
+                setToken(loginResponse.token);
+            }
+        } catch (e : any) {
+            if(e?.response?.data?.error){
+                console.log(e?.response);
+                setError(e?.response?.data?.error);
+                return;
+            }
+            console.log(e);
+            setError('Erro ao efetuar login, tente novamente');
+        }
+    }
+
+    const doSignUp = async () => {
+        try {
+            if (!signUp || !password) {
                 setError('favor preencher os dados');
                 return;
             }
@@ -43,9 +76,12 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                 return;
             }
             console.log(e);
-            setError('Ocorreu erro ao efetuar login, tente novamenete');
+            setError('Erro ao efetuar login, tente novamente');
         }
     }
+
+
+
 
     return (
         <div className="container-login">
@@ -62,7 +98,10 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                     <input type="password" placeholder="Informe sua senha"
                         value={password} onChange={evento => setPassword(evento.target.value)} />
                 </div>
-                <button onClick={doLogin}>Login</button>
+                <div className="buttons">
+                    <button onClick={doLogin}>Login</button>
+                    <button onClick={doSignUp}>SignUp</button>
+                </div>
             </div>
 
         </div>
