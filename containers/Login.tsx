@@ -16,8 +16,6 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
     const [password, setPassword] = useState('');
     const [msgError, setError] = useState('');
 
-
-
     // state Modal
     const [showModal, setShowModal] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
@@ -25,11 +23,62 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
     const [name, setName] = useState('');
     const [email,setEmail] = useState('');
     const [confirmaEmail,setConfirmaEmail] = useState('');
+    const [passwordSignUp, setPasswordSignUp] = useState('');
 
-    // FALTA FAZER COM QUE EMAIL NÃO POSSA SER DIFERENTE DO CONFIRMA EMAIL.
+
     const closeModal = () => {
         setShowModal(false);
+        setUserName('');
+        setName('');
+        setEmail('');
+        setConfirmaEmail('');   
+        setPasswordSignUp('');
+    }
+
+    const doSave = async () => { 
+        try {
+            if (email != confirmaEmail) {
+                setErrorMsg('Email e confirmação não coincidem. Por favor verifique.');
+                return;
+            } 
+
+            if (passwordSignUp.length < 6) {
+                setErrorMsg('Escolha uma senha com mais de 6 caracteres.')
+                return;
+            }
+
+            if (!userName || !name || !email || !confirmaEmail || !passwordSignUp) {
+                setErrorMsg('Campos não estão completos. Por favor verifique.');
+                return;
+            } 
+
+            if (name.length < 2) {
+                setErrorMsg ('Nome é muito curto. Favor incluir um nome maior');
+                return;
+                }
+
+                const body = {
+                    userName,
+                    name,
+                    email,
+                    passwordSignUp
+                }
+
+                await executeRequest('signUp', 'POST', body);
+                await getIncludeUser();
+                closeModal();
+
+
+        }catch(e){
+            if(e?.response?.data?.error){
+                console.log(e?.response);
+                setErrorMsg(e?.response.data?.error);
+                return;
+            }
+            console.log(e);
+            setErrorMsg('Ocorreu um erro ao realizar o cadastro. Por favor, tente novamente');
         }
+    }
 
     const doSignUp = async () => {
         setShowModal(true);
@@ -111,10 +160,14 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                                 placeholder="confirme seu e-mail"
                                 value={confirmaEmail}
                                 onChange={e => setConfirmaEmail(e.target.value)}/>
+                            <input type="text"
+                                placeholder="senha com mais de 6 caracteres"
+                                value={passwordSignUp}
+                                onChange={e => setPasswordSignUp(e.target.value)}/>
                         </Modal.Body>
                         <Modal.Footer>
                             <div className ="button col-12">
-                                <button>Cadastrar</button>
+                                <button onClick={doSave}>Cadastrar</button>
                                 <span onClick={closeModal}>Cancelar</span>
                             </div>
                         </Modal.Footer>
