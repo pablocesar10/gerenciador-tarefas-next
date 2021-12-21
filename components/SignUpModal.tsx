@@ -17,7 +17,7 @@ type ModalProps = {
     doDelete?() : void
 }
 
-export const CrudModal : NextPage<ModalProps> = ({ 
+export const CrudModalSignUp : NextPage<ModalProps> = ({ 
     showModal,
     name,
     previsionDate,

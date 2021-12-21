@@ -16,9 +16,17 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
     const [password, setPassword] = useState('');
     const [msgError, setError] = useState('');
 
+
+
     // state Modal
     const [showModal, setShowModal] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [userName, setUserName] = useState('');
+    const [name, setName] = useState('');
+    const [email,setEmail] = useState('');
+    const [confirmaEmail,setConfirmaEmail] = useState('');
+
+    // FALTA FAZER COM QUE EMAIL NÃO POSSA SER DIFERENTE DO CONFIRMA EMAIL.
     const closeModal = () => {
         setShowModal(false);
         }
@@ -26,29 +34,10 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
     const doSignUp = async () => {
         setShowModal(true);
         return   
-/*            <Modal
-            show={showModal}
-            onHide={() => closeModal()}
 
-            className="container-modal">
-                <Modal.Body>
-                    <p>Cadastre-se</p>
-                    {errorMsg && <p className = "error">{errorMsg}</p>}
-                    <input type="text"/>
-                    <input type="text"/>
-                    <input type="text"/>
-                    <input type="text"/>
-                </Modal.Body>
-                <Modal.Footer>
-                    <div className ="button col-12">
-                        <button> Salvar </button>
-                        <span>Calcelar</span>
-                </Modal.Footer>
-                </Modal>
-*/
+        // CRIAR MENSAGEM DE ERRO
+
         }
-
-    
 
     const doLogin = async () => {
         try {
@@ -104,17 +93,30 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                     <button onClick={doSignUp}>SignUp</button>
                     <Modal show={showModal} onHide={() => closeModal()} className="container-modal">
                         <Modal.Body>
-                            <p>Cadastre-se</p>
+                            <p>Faça seu Cadastro</p>
                             {errorMsg && <p className = "error">{errorMsg}</p>}
-                            <input type="text"/>
-                            <input type="text"/>
-                            <input type="text"/>
-                            <input type="text"/>
+                            <input type="text"
+                                placeholder="Escolha um nome de usuário"
+                                value={userName}
+                                onChange={e => setUserName(e.target.value)}/>
+                            <input type="text"
+                                placeholder="Nome completo"
+                                value={name}
+                                onChange={e => setName(e.target.value)}/>
+                            <input type="text"
+                                placeholder="E-mail"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}/>
+                            <input type="text"
+                                placeholder="confirme seu e-mail"
+                                value={confirmaEmail}
+                                onChange={e => setConfirmaEmail(e.target.value)}/>
                         </Modal.Body>
                         <Modal.Footer>
                             <div className ="button col-12">
-                                <button> Salvar </button>
-                                <span>Calcelar</span>
+                                <button>Cadastrar</button>
+                                <span onClick={closeModal}>Cancelar</span>
+                            </div>
                         </Modal.Footer>
                     </Modal>
                 </div>
@@ -123,4 +125,3 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
 
     )
 }
-
