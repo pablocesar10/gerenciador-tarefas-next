@@ -42,11 +42,6 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                 return;
             } 
 
-            if (!(/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/.test(email))) {
-                setErrorMsg('Email está incorreto. Por favor verifique.');
-                return;
-            }
-
             if (passwordSignUp.length < 6) {
                 setErrorMsg('Escolha uma senha com mais de 6 caracteres.')
                 return;
@@ -150,7 +145,7 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                             <p>Faça seu Cadastro</p>
                             {errorMsg && <p className = "error">{errorMsg}</p>}
                             <input type="text"
-                                placeholder="Digite um nome de usuário"
+                                placeholder="Escolha um nome de usuário"
                                 value={userName}
                                 onChange={e => setUserName(e.target.value)}/>
                             <input type="text"
@@ -162,11 +157,11 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}/>
                             <input type="text"
-                                placeholder="Confirme seu e-mail"
+                                placeholder="confirme seu e-mail"
                                 value={confirmaEmail}
                                 onChange={e => setConfirmaEmail(e.target.value)}/>
                             <input type="text"
-                                placeholder="Defina uma senha com mais de 6 caracteres"
+                                placeholder="senha com mais de 6 caracteres"
                                 value={passwordSignUp}
                                 onChange={e => setPasswordSignUp(e.target.value)}/>
                         </Modal.Body>
