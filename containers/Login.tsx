@@ -1,10 +1,9 @@
 import { NextPage } from "next";
 import { useState } from "react"
-import { executeRequest } from "../services/api";
-import { LoginRequest } from "../types/LoginRequest";
+import { executeRequest, saveUser } from "../services/api";
+// import { LoginRequest } from "../types/LoginRequest";
 import { LoginResponse } from "../types/LoginResponse";
 import {Modal} from 'react-bootstrap';
-// import {CrudModal} from '../components/Modal';
 
 type LoginProps = {
     setToken(s: string) : void
@@ -13,84 +12,85 @@ type LoginProps = {
 export const Login : NextPage<LoginProps> = ({setToken}) => {
 
     const [login, setLogin] = useState('');
-    const [password, setPassword] = useState('');
     const [msgError, setError] = useState('');
 
     // state Modal
     const [showModal, setShowModal] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [userName, setUserName] = useState('');
     const [name, setName] = useState('');
     const [email,setEmail] = useState('');
     const [confirmaEmail,setConfirmaEmail] = useState('');
-    const [passwordSignUp, setPasswordSignUp] = useState('');
-
-
+    const [password, setPassword] = useState('');
+    const [confirmaPassword, setConfirmaPassword] = useState('');
+    const cadastroOK = false;
     const closeModal = () => {
         setShowModal(false);
-        setUserName('');
         setName('');
         setEmail('');
         setConfirmaEmail('');   
-        setPasswordSignUp('');
+        setPassword('');
+        setConfirmaPassword('');
+        setErrorMsg('');
     }
 
-    const doSave = async () => { 
+    const doCadastro = async () => { 
         try {
-            if (email != confirmaEmail) {
-                setErrorMsg('Email e confirmação não coincidem. Por favor verifique.');
+            if (!name || !email || !confirmaEmail || !password) {
+                setErrorMsg('Dados incompletos. Por favor verifique.');
                 return;
             } 
+            
+            if (name.length < 2) {
+                setErrorMsg ('Nome é muito curto. Digite nome completo.');
+                return;
+            }
 
             if (!(/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/.test(email))) {
-                setErrorMsg('Email está incorreto. Por favor verifique.');
+                setErrorMsg('Por favor verifique o email digitado.');
                 return;
             }
 
-            if (passwordSignUp.length < 6) {
-                setErrorMsg('Escolha uma senha com mais de 6 caracteres.')
-                return;
-            }
-
-            if (!userName || !name || !email || !confirmaEmail || !passwordSignUp) {
-                setErrorMsg('Campos não estão completos. Por favor verifique.');
+            if (email != confirmaEmail) {
+                setErrorMsg('Email e confirmação não coincidem.');
                 return;
             } 
 
-            if (name.length < 2) {
-                setErrorMsg ('Nome é muito curto. Favor incluir um nome maior');
+            if (password.length < 6) {
+                setErrorMsg('Digite uma senha maior que 5 caracteres.')
                 return;
-                }
+            }
 
-                const body = {
-                    userName,
-                    name,
-                    email,
-                    passwordSignUp
-                }
+            if (password != confirmaPassword) {
+                setErrorMsg('Senha e confirmação de senha não coincidem.');
+                return;
+            }
 
-                await executeRequest('signUp', 'POST', body);
-                await getIncludeUser();
-                closeModal();
+            const body = {
+                name,
+                email,
+                password
+            }
 
+            await saveUser('user', 'POST', body);
+            closeModal();
 
         }catch(e){
             if(e?.response?.data?.error){
                 console.log(e?.response);
                 setErrorMsg(e?.response.data?.error);
                 return;
+            } else {
+                const cadastroOK = true;
             }
             console.log(e);
-            setErrorMsg('Ocorreu um erro ao realizar o cadastro. Por favor, tente novamente');
+            setErrorMsg('Erro ao realizar cadastro. Tente novamente');
         }
+        setError('CADASTRO EFETUADO COM SUCESSO. FAÇA LOGIN');
     }
 
-    const doSignUp = async () => {
+    const openModal = async () => {
         setShowModal(true);
         return   
-
-        // CRIAR MENSAGEM DE ERRO
-
         }
 
     const doLogin = async () => {
@@ -125,8 +125,6 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
             setError('Erro ao efetuar login, tente novamente');
         }
     }
-
-
     return (
         <div className="container-login">
             <img src="/logo.svg" alt="Logo Fiap" className="logo" />
@@ -144,17 +142,17 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                 </div>
                 <div className="buttons">
                     <button onClick={doLogin}>Login</button>
-                    <button onClick={doSignUp}>SignUp</button>
-                    <Modal show={showModal} onHide={() => closeModal()} className="container-modal">
+                    <button onClick={openModal}>SignUp</button>
+                    <Modal 
+                    show={showModal}
+                    onHide={() => closeModal()}                    
+                    className="container-modal">
                         <Modal.Body>
                             <p>Faça seu Cadastro</p>
                             {errorMsg && <p className = "error">{errorMsg}</p>}
+
                             <input type="text"
-                                placeholder="Digite um nome de usuário"
-                                value={userName}
-                                onChange={e => setUserName(e.target.value)}/>
-                            <input type="text"
-                                placeholder="Nome completo"
+                                placeholder="Seu nome completo"
                                 value={name}
                                 onChange={e => setName(e.target.value)}/>
                             <input type="text"
@@ -166,13 +164,18 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                                 value={confirmaEmail}
                                 onChange={e => setConfirmaEmail(e.target.value)}/>
                             <input type="text"
-                                placeholder="Defina uma senha com mais de 6 caracteres"
-                                value={passwordSignUp}
-                                onChange={e => setPasswordSignUp(e.target.value)}/>
+                                placeholder="Digite uma senha maior que 5 caracteres"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}/>
+                            <input type="text"
+                                placeholder="Confirme sua senha"
+                                value={confirmaPassword}
+                                onChange={e => setConfirmaPassword(e.target.value)}/>
+
                         </Modal.Body>
                         <Modal.Footer>
                             <div className ="button col-12">
-                                <button onClick={doSave}>Cadastrar</button>
+                                <button onClick={doCadastro}>Cadastrar</button>
                                 <span onClick={closeModal}>Cancelar</span>
                             </div>
                         </Modal.Footer>

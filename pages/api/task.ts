@@ -21,7 +21,7 @@ const taskEndpoint = async (req: NextApiRequest, res: NextApiResponse<DefaultRes
         case 'GET':
             return await getTasks(req, res, userId);
         default:
-            return res.status(405).json({ error: 'Metodo infomado não é valido' });
+            return res.status(405).json({ error: 'Método infomado não é valido' });
     }
 }
 
