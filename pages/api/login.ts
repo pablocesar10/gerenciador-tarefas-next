@@ -39,7 +39,7 @@ const loginEndpoint = async(req : NextApiRequest,
         return res.status(400).json({ error : 'Usuário ou senha não encontrado'});
     }
 
-    return res.status(405).json({ error : 'Método informado não é valido'});
+    return res.status(405).json({ error : 'Metodo infomado não é valido'});
 }
 
 export default connectDb(loginEndpoint);

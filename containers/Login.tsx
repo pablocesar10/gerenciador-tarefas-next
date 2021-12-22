@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { useState } from "react"
-import { executeRequest, saveUser } from "../services/api";
+import { executeRequest } from "../services/api";
 import { LoginRequest } from "../types/LoginRequest";
 import { LoginResponse } from "../types/LoginResponse";
 import {Modal} from 'react-bootstrap';
@@ -13,62 +13,61 @@ type LoginProps = {
 export const Login : NextPage<LoginProps> = ({setToken}) => {
 
     const [login, setLogin] = useState('');
- //   const [userName,setUserName] = useState('');
-//    const [password, setPassword] = useState('');
+    const [password, setPassword] = useState('');
     const [msgError, setError] = useState('');
 
     // state Modal
     const [showModal, setShowModal] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [name,setName] = useState('');
+    const [userName, setUserName] = useState('');
+    const [name, setName] = useState('');
     const [email,setEmail] = useState('');
     const [confirmaEmail,setConfirmaEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmaPassword, setConfirmaPassword] = useState('');
+    const [passwordSignUp, setPasswordSignUp] = useState('');
+
 
     const closeModal = () => {
         setShowModal(false);
+        setUserName('');
         setName('');
         setEmail('');
         setConfirmaEmail('');   
-        setPassword('');
-        setConfirmaPassword('');
+        setPasswordSignUp('');
     }
-    
+
     const doSave = async () => { 
         try {
-            if (!name || !email || !confirmaEmail || !password || !confirmaPassword) {
-                setErrorMsg('Campos não estão completos. Por favor verifique.');
-                return;
-            } 
-            if (name.length < 2) {
-                setErrorMsg ('Nome é muito curto. Favor incluir um nome maior');
-                return;
-                }
-            if (!(/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/.test(email))) {
-                setErrorMsg('Email está incorreto. Por favor verifique.');
-                return;
-            }
             if (email != confirmaEmail) {
                 setErrorMsg('Email e confirmação não coincidem. Por favor verifique.');
                 return;
             } 
-            if (password.length < 6) {
+
+            if (passwordSignUp.length < 6) {
                 setErrorMsg('Escolha uma senha com mais de 6 caracteres.')
                 return;
             }
-            if (password != confirmaPassword) {
-                setErrorMsg('Verifique a confirmação da senha.');
+
+            if (!userName || !name || !email || !confirmaEmail || !passwordSignUp) {
+                setErrorMsg('Campos não estão completos. Por favor verifique.');
                 return;
-            }
-                const body = {
-                    name,
-                    email,
-                    password
+            } 
+
+            if (name.length < 2) {
+                setErrorMsg ('Nome é muito curto. Favor incluir um nome maior');
+                return;
                 }
 
-            await saveUser('user', 'POST', body);
-            closeModal();
+                const body = {
+                    userName,
+                    name,
+                    email,
+                    passwordSignUp
+                }
+
+                await executeRequest('signUp', 'POST', body);
+                await getIncludeUser();
+                closeModal();
+
 
         }catch(e){
             if(e?.response?.data?.error){
@@ -84,6 +83,9 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
     const doSignUp = async () => {
         setShowModal(true);
         return   
+
+        // CRIAR MENSAGEM DE ERRO
+
         }
 
     const doLogin = async () => {
@@ -119,6 +121,7 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
         }
     }
 
+
     return (
         <div className="container-login">
             <img src="/logo.svg" alt="Logo Fiap" className="logo" />
@@ -142,6 +145,10 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                             <p>Faça seu Cadastro</p>
                             {errorMsg && <p className = "error">{errorMsg}</p>}
                             <input type="text"
+                                placeholder="Escolha um nome de usuário"
+                                value={userName}
+                                onChange={e => setUserName(e.target.value)}/>
+                            <input type="text"
                                 placeholder="Nome completo"
                                 value={name}
                                 onChange={e => setName(e.target.value)}/>
@@ -150,17 +157,13 @@ export const Login : NextPage<LoginProps> = ({setToken}) => {
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}/>
                             <input type="text"
-                                placeholder="Confirme seu e-mail"
+                                placeholder="confirme seu e-mail"
                                 value={confirmaEmail}
                                 onChange={e => setConfirmaEmail(e.target.value)}/>
                             <input type="text"
-                                placeholder="Defina uma senha com mais de 5 caracteres"
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}/>
-                            <input type="text"
-                                placeholder="Confirme sua senha"
-                                value={confirmaPassword}
-                                onChange={e => setConfirmaPassword(e.target.value)}/>
+                                placeholder="senha com mais de 6 caracteres"
+                                value={passwordSignUp}
+                                onChange={e => setPasswordSignUp(e.target.value)}/>
                         </Modal.Body>
                         <Modal.Footer>
                             <div className ="button col-12">
